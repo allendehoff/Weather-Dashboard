@@ -17,48 +17,52 @@ var searchCity = $("#citySearch").val()
 init()
 
 function init (){
-    searches = JSON.parse(localStorage.getItem("searches"))
-    if (searches !== null){
-        // $("#pastSearches").empty()
-    for (var i = (searches.length -1); i >= 0; i--){
-        makeButton(searches[i])
+    searched = JSON.parse(localStorage.getItem("searches"))
+    console.log(searched)
+    if (searched !== null){
+    for (var i = (searched.length -1); i >= 0; i--){
+        makeButton(searched[i])
     }
-    currentWeather(searches[0])
+    currentWeather(searched[0])
+    forecast(searched[0])
 } else {return}
+
 }
 
 $("#searchBtn").on("click", function(){
     event.preventDefault()
+    $("#results").empty()
     var currentSearch = $("#citySearch").val()
-    // console.log($("#citySearch").val())
     currentWeather($("#citySearch").val())
     forecast($("#citySearch").val())
-    // UVIndex()
-    // .then({appendCurrent})
-    // appendCurrent()
 
-    var index = searched.findIndex(x => currentSearch)
-
-    // if(searched.indexOf(currentSearch) === -1){
-    if(index === -1){
-        searched.push(currentSearch)
+    if ((jQuery.inArray(currentSearch, searched)) === -1){
+        if (searched === null){
+            searched = []
+        }
+        searched.unshift(currentSearch)
         makeButton(currentSearch)
         localStorage.setItem("searches", JSON.stringify(searched))
+    } else if (searched.indexOf(currentSearch) > 0) {
+        var index = (searched.indexOf(currentSearch));
+        searched.splice(index, 1);
+        searched.unshift(currentSearch);
+        localStorage.setItem("searches", JSON.stringify(searched))
     }
-        else{
-            return
-        }
-    // localStorage.setItem("searches", JSON.stringify(searched))
-
-    // searched += $("#citySearch").val()
-    // console.log(searched)
-    // localStorage.setItem("searches")
 })
 
 
 $(document).on("click", ".button", function(){
-
+    $("#results").empty()
+    var currentSearch = $(this).attr("data-city")
     currentWeather($(this).attr("data-city"))
+    forecast($(this).attr("data-city"))
+    if (searched.indexOf(currentSearch) > 0) {
+        var index = (searched.indexOf(currentSearch));
+        searched.splice(index, 1);
+        searched.unshift(currentSearch);
+        localStorage.setItem("searches", JSON.stringify(searched))
+    }
 })
 
 
@@ -70,16 +74,8 @@ function makeButton(newCity){
 }
 
 
-
-
-// function both(){
-//     currentWeather
-    // uvIndex
-
-    // }
-
 function forecast(city){
-    var queryURL = "http://api.openweathermap.org/data/2.5/forecast?q="
+    var queryURL = "http://api.openweathermap.org/data/2.5/forecast/?q="
         + city
         + "id=524901&APPID=b5a82a3d512edf5c9c61aa680da96499"
 
@@ -88,9 +84,43 @@ function forecast(city){
             method: "GET"
         })
         .then(function(forecast) {
-            console.log(forecast)
+            var newDiv = $("<div>").addClass("forecast")
+            newDiv.prepend($("<h2>").text("5-Day Forecast:"))
+            var daysDiv = $("<div>").addClass("daysDiv")
+            var dayIndex = 1
+            for (var x = 0; x <= 32; x+=8){
+                var newDay = $("<div>").addClass("day")
+                var day = moment().add(dayIndex, "d").format("M/D/YYYY")
+                dayIndex++
+                var temps = []
+                var hums = []
+
+                for (var i = x; i <= (x+7); i++){
+                    temps.push(forecast.list[i].main.temp)
+                    hums.push(forecast.list[i].main.humidity)
+                }
+                var min = Math.min.apply(Math, temps)
+                var max = Math.max.apply(Math, temps)
+                var maxhum = Math.max.apply(Math, hums)
+                var minF = ((((min - 273.15) * 9) / 5)+32).toFixed(1)
+                var maxF = ((((max - 273.15) * 9) / 5)+32).toFixed(1)
+                var icon = forecast.list[x].weather[0].icon
+
+                newDay.append($("<h3>").text(day))
+                newDay.append($("<img>").attr("src", "http://openweathermap.org/img/w/" + icon + ".png"))
+                newDay.append($("<p>").text("High: " + maxF + " °F"))
+                newDay.append($("<p>").text("Low: " + minF + " °F"))
+                newDay.append($("<p>").text("Max Humidity: " + maxhum + "%"))
+
+                daysDiv.append(newDay)
+            }
+            newDiv.append(daysDiv)
+
+            $("#results").append(newDiv)
         })
 }
+
+
 function currentWeather(city){
     var queryURL = "http://api.openweathermap.org/data/2.5/weather?q=" 
         + city 
@@ -101,8 +131,6 @@ function currentWeather(city){
             method: "GET"
         })
             .then(function(data) {
-
-            // console.log(data)
             cityName = data.name
             weatherIcon = data.weather[0].icon
             iconSrc = "http://openweathermap.org/img/w/" + weatherIcon + ".png"
@@ -113,13 +141,6 @@ function currentWeather(city){
             lat = data.coord.lat
             lon = data.coord.lon
 
-            // console.log(cityName)
-            // console.log(currentDay)
-            // console.log(temp)
-            // console.log(humidity)
-            // console.log(windSpd)
-            // console.log(iconSrc)
-            
                 var uvURL = "http://api.openweathermap.org/data/2.5/uvi?" 
                     + "appid=b5a82a3d512edf5c9c61aa680da96499"
                     + "&lat=" + lat
@@ -139,16 +160,13 @@ function currentWeather(city){
 
 
 function appendCurrent(){
-    $("#results").empty()
-    var newDiv = $("<div>").addClass("results")
+    var newDiv = $("<div>").addClass("current")
     var headline = $("<h2>").text(cityName + " (" + currentDay + ") ")
     var icon = $("<img>").attr("src", iconSrc)
     var tempEl = $("<p>").text("Temperature: " + tempF + " °F")
     var humidityEl = $("<p>").text("Humidity: " + humidity + "%")
     var windEl = $("<p>").text("Wind Speed: " + windSpd + " MPH")
     var UVEl = $("<p>").text("UV Index: " + UV)
-    
-    
     
     $(headline).append(icon)
     $(newDiv).append(headline)
@@ -158,48 +176,4 @@ function appendCurrent(){
     $(newDiv).append(UVEl)
     
     $("#results").prepend(newDiv)
-    
 }
-
-
-// function UVIndex(){
-// var uvURL = "http://api.openweathermap.org/data/2.5/uvi?" 
-//                     + "appid=b5a82a3d512edf5c9c61aa680da96499"
-//                     + "&lat=" + lat
-//                     + "&lon=" + lon
-
-//                 $.ajax({
-//                     url: uvURL,
-//                     method: "GET"
-//                 })
-//                     .then(function(UVdata) {
-//                     UV = UVdata.value
-//                     console.log(UV)
-                    
-
-//                 // appendCurrent()
-//                 })
-//             }
-
-// function uvIndex(){
-//     // event.preventDefault()
-
-//     console.log("uv index")
-//     // var lat = $(this).data.coord.lat
-//     // var lon = $(this).data.coord.lon
-
-//     var uvURL = "http://api.openweathermap.org/data/2.5/uvi?" 
-//         + "appid=b5a82a3d512edf5c9c61aa680da96499"
-//         + "&lat=" + lat
-//         + "&lon=" + lon
-
-// $.ajax({
-//     url: uvURL,
-//     method: "GET"
-// })
-//     .then(function(UV) {
-// console.log(UV)
-
-
-// })
-// }
