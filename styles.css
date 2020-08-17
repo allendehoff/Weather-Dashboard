@@ -8,6 +8,20 @@
     background-color: lightgrey;
 }
 
+ul {
+    border: 2px solid lightgrey;
+    border-radius: 10px;
+    background-color: white;
+    margin-top: 10px;
+    padding: 0;
+}
+
+li {
+    text-align: center;
+    list-style: none;
+    border-bottom: 2px solid lightgrey;
+    padding: 5px 0;
+}
 .results {
     border: 2px solid lightgrey;
     border-radius: 10px;
