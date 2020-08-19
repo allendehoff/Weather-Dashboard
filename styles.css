@@ -50,3 +50,28 @@ li {
     padding: 5px 5px 0 5px;
     margin-bottom: 10px;
 }
+
+.UV {
+    padding: 5px;
+    border-radius: 10px;
+}
+
+.low {
+    background-color: green;
+}
+
+.moderate {
+    background-color: yellow;
+}
+
+.high {
+    background-color: orange;
+}
+
+.veryhigh {
+    background-color: red;
+}
+
+.extreme {
+    background-color: violet;
+}

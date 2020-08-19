@@ -166,13 +166,27 @@ function appendCurrent(){
     var tempEl = $("<p>").text("Temperature: " + tempF + " °F")
     var humidityEl = $("<p>").text("Humidity: " + humidity + "%")
     var windEl = $("<p>").text("Wind Speed: " + windSpd + " MPH")
-    var UVEl = $("<p>").text("UV Index: " + UV)
+    var UVEl = $("<p>").text("UV Index: ")
+    var UVnum = $("<span>").text(UV).addClass("UV")
+    //if statement to color UV Index background from classes in css
+    if (UV < 3){
+        UVnum.addClass("low")
+    } else if (UV < 6) {
+        UVnum.addClass("moderate")
+    } else if (UV < 8) {
+        UVnum.addClass("high")
+    } else if (UV < 11) {
+        UVnum.addClass("veryhigh")
+    } else if (UV >= 11) {
+        UVnum.addClass("extreme")
+    }
     
     $(headline).append(icon)
     $(newDiv).append(headline)
     $(newDiv).append(tempEl)
     $(newDiv).append(humidityEl)
     $(newDiv).append(windEl)
+    $(UVEl).append(UVnum)
     $(newDiv).append(UVEl)
     
     $("#results").prepend(newDiv)
