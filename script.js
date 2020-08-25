@@ -75,7 +75,7 @@ function makeButton(newCity){
 
 
 function forecast(city){
-    var queryURL = "http://api.openweathermap.org/data/2.5/forecast/?q="
+    var queryURL = "https://api.openweathermap.org/data/2.5/forecast/?q="
         + city
         + "id=524901&APPID=b5a82a3d512edf5c9c61aa680da96499"
 
@@ -107,7 +107,7 @@ function forecast(city){
                 var icon = forecast.list[x].weather[0].icon
 
                 newDay.append($("<h3>").text(day))
-                newDay.append($("<img>").attr("src", "http://openweathermap.org/img/w/" + icon + ".png"))
+                newDay.append($("<img>").attr("src", "https://openweathermap.org/img/w/" + icon + ".png"))
                 newDay.append($("<p>").text("High: " + maxF + " °F"))
                 newDay.append($("<p>").text("Low: " + minF + " °F"))
                 newDay.append($("<p>").text("Max Humidity: " + maxhum + "%"))
@@ -122,7 +122,7 @@ function forecast(city){
 
 
 function currentWeather(city){
-    var queryURL = "http://api.openweathermap.org/data/2.5/weather?q=" 
+    var queryURL = "https://api.openweathermap.org/data/2.5/weather?q=" 
         + city 
         + "id=524901&APPID=b5a82a3d512edf5c9c61aa680da96499"
 
@@ -133,7 +133,7 @@ function currentWeather(city){
             .then(function(data) {
             cityName = data.name
             weatherIcon = data.weather[0].icon
-            iconSrc = "http://openweathermap.org/img/w/" + weatherIcon + ".png"
+            iconSrc = "https://openweathermap.org/img/w/" + weatherIcon + ".png"
             temp = data.main.temp
             tempF = ((((temp - 273.15) * 9) / 5)+32).toFixed(1)
             humidity = data.main.humidity
@@ -141,7 +141,7 @@ function currentWeather(city){
             lat = data.coord.lat
             lon = data.coord.lon
 
-                var uvURL = "http://api.openweathermap.org/data/2.5/uvi?" 
+                var uvURL = "https://api.openweathermap.org/data/2.5/uvi?" 
                     + "appid=b5a82a3d512edf5c9c61aa680da96499"
                     + "&lat=" + lat
                     + "&lon=" + lon
